@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="https://bootstraptema.ru/snippets/games/2023/15shki.online.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+Tamma+2:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://bootstraptema.ru/snippets/games/2023/jquery-3.5.0.min.js"></script>    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+<body>
+    <div class="blockgames">
+        <div class="heading">
+            <h1 class="title">15шки</h1>
+            <div class="scores-blockgames">
+                <div class="score-blockgames">00:00.<small>00</small></div>
+                <div class="best-blockgames">30:49<small>01</small></div>
+            </div>
+        </div>
+        <div class="game-blockgames">
+            <div class="game-message"><a class="retry-button">НАЧАТЬ</a></div>
+            <div id="Puzzle" class="def"></div>
+        </div>
+        <p class="game-explanation"><strong class="important">Правила игры: необходимо выставить по порядку «квадратики», с цифрами от одного до пятнадцати. Одна только трудность: пустующее окошко лишь одно. Кости придется передвигать раз за разом, сдвигая цифры в нужном направлении.</strong></p>
+        <hr>
+        <p>Создано с помощью: <a href="https://bootstraptema.ru" target="_blank">BootstrapTema</a></p>
+        <hr><p>Постарайтесь закончить головоломку 15шКу за меньшее время. Это будет означать, что вы закончили с меньшим количеством ходов.</strong></p>
+    </div>
+    <script type="text/javascript">
+        $(function() {
+            var ms, s, m, h, b, init = 0,
+                startDate, clockTimer, bestRecord = 9999999;
+            function isSupported() {
+                try {
+                    const testKey = "some_random_key_you_are_not_going_to_use";
+                    localStorage.setItem(testKey, testKey);
+                    localStorage.removeItem(testKey);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+            if (isSupported()) {
+bestRecord = Number.isNaN(+localStorage.getItem('best')) ? 9999999 : localStorage.getItem('best')  9999999;
+            }
+            setBest(bestRecord);
+            function setBest(val) {
+                if (val <= bestRecord) {
+                    $('.best-blockgames').html(convert(val));
+                }
+            }
+            function convert(t) {
+                if (t === 9999999) {
+                    return '30:49.<small>01</small>';
+                }
+                ms = t % 1000;
+                t -= ms;
+                ms = Math.floor(ms / 10);
+                t = Math.floor(t / 1000);
+                s = t % 60;
+                t -= s;
+                t = Math.floor(t / 60);
+                m = t % 60;
+                t -= m;
+                t = Math.floor(t / 60);
+                h = t % 60;
+                if (h < 10) h = '0' + h;
+                if (m < 10) m = '0' + m;
+                if (s < 10) s = '0' + s;
+                if (ms < 10) ms = '0' + ms;
+                return m + ':' + s + '.<small>' + ms + '</small>';
+            }
+            function startTIME() {
+                var thisDate = new Date();
+                var t = thisDate.getTime() - startDate.getTime();
+                b = t;
+                if (init === 1) {
+                    $('.score-blockgames').html(convert(t));
+                    clockTimer = setTimeout(function() {
+                        startTIME();
+                    }, 10);
+                }
+            }
+            $('.best-blockgames').bind('click', function() {
+                bestRecord = 9999999;
+                if (isSupported()) {
+                    localStorage.removeItem('best');
+                }
+                setBest(bestRecord);
+            });
+            var config = {
+                img_puzzle: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+                duration: 200,
+                width: 490,
+                height: 480,
+                gap: 10,
+                isSwipe: false,
+                auto_size: true,
+                bgColor: '#C5D0E6',
+                tilesH: 4,
+                tilesV: 4,
+                mixed: true,
+                numbering: true,
+                imgBgOpacity: 0,
+                shuffleNum: 0,
+                onCompleted: function() {
+                    init = 0;
+                    jQuery('.retry-button').text("Попробовать еще раз").show();
+                    jQuery('.game-message').show();
+                    clearTimeout(clockTimer);
+                    setBest(Math.floor(b));
+                    if (isSupported()) {
+                        localStorage.setItem('best', Math.floor(b));
+                    }
+                },
+                onStartPlay: function() {
+                    init = 1;
+                    startDate = new Date();
+                    startTIME();
+                }
+            };
+            $('#Puzzle.def').shufflepuzzle(config);
+            $('.score-blockgames, .retry-button').bind('click', function() {
+                start();
+            });
+            $(document).bind('keydown', function(e) {
+                if ((e.which === 13  e.which === 32) && init === 0) {
+                    start();
+                }
+            });
+            function start() {
+                clearTimeout(clockTimer);
+                jQuery('.game-message').hide();
+                jQuery('#Puzzle.def').shufflepuzzle['def']({
+                    shuffleNum: 25
+                });
+            }
+        });
+    </script>
+</body>
+</html>
